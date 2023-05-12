@@ -1,5 +1,9 @@
 /* global chrome */
 import React, { useEffect, useState } from 'react';
+import './App.css';
+import { Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 function App() {
   const [prompts, setPrompts] = useState([]);
@@ -45,19 +49,25 @@ function App() {
 
   return (
     <div className="App">
-      {prompts.map(({ text, count, key }) => {
-        console.log('Rendering prompt:', key, text, count); // Check the values used in rendering
-        return (
-        <div key={key}>
-          <p onClick={() => copyToClipboard(text, key)}>
-            {text} (used {count} times)
-          </p>
-          <button onClick={() => deletePrompt(key)}>
-            Delete
-          </button>
-        </div>
-      );
-      })}
+      <Box p={2}>
+        <Typography variant="h6" component="div">My Prompts</Typography>
+        <List>
+          {prompts.map(({ text, count, key }) => (
+            <ListItem key={key} secondaryAction={
+              <IconButton edge="end" aria-label="delete" onClick={() => deletePrompt(key)}>
+                <DeleteIcon />
+              </IconButton>
+            }>
+              <ListItemText
+                primary={text}
+                secondary={`Used ${count} times`}
+                className="prompt"
+                onClick={() => copyToClipboard(text, key)}
+              />
+            </ListItem>
+          ))}
+        </List>
+      </Box>
     </div>
   );
 }
