@@ -52,24 +52,30 @@ function App() {
       <Box p={2}>
         <Typography variant="h6" component="div">My Prompts</Typography>
         <List>
-          {prompts.map(({ text, count, key }) => (
-            <ListItem key={key} secondaryAction={
-              <IconButton edge="end" aria-label="delete" onClick={() => deletePrompt(key)}>
-                <DeleteIcon />
-              </IconButton>
-            }>
-              <ListItemText
-                primary={text}
-                secondary={`Used ${count} times`}
-                className="prompt"
+          {prompts.map(({ text, key }) => (
+            <ListItem key={key} disableGutters>
+              <Box
+                className="prompt" 
                 onClick={() => copyToClipboard(text, key)}
-              />
+              >
+                <ListItemText primary={text} />
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    deletePrompt(key);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
             </ListItem>
           ))}
         </List>
       </Box>
     </div>
-  );
+  );  
 }
 
 export default App;

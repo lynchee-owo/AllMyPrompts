@@ -42,17 +42,20 @@ body {
 }
 
 .prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 5px;
+  background-color: #e1e8ff;
+  width: 100%;
   cursor: pointer;
   padding: 10px;
-  border-bottom: 1px solid #1528ff;
 }
 
 .prompt:hover {
-  background-color: #a7beff;
+  background-color: #a2b8ff;
 }
 
 .delete-button {
-  margin-left: 10px;
   color: red;
-  cursor: pointer;
 }
