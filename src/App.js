@@ -18,6 +18,27 @@ function App() {
     });
   }, []);
 
+  const toggleEdit = (key) => {
+    chrome.storage.sync.get(key, function(result) {
+      let newPrompt = result[key];
+      newPrompt.editing = !newPrompt.editing;
+      chrome.storage.sync.set({ [key]: newPrompt }, function() {
+        setPrompts(prevPrompts => prevPrompts.map(prompt => prompt.key === key ? { key, ...newPrompt } : prompt));
+      });
+    });
+  }
+  
+  const handlePromptChange = (key, newText) => {
+    chrome.storage.sync.get(key, function(result) {
+      let newPrompt = result[key];
+      newPrompt.text = newText;
+      chrome.storage.sync.set({ [key]: newPrompt }, function() {
+        setPrompts(prevPrompts => prevPrompts.map(prompt => prompt.key === key ? { key, ...newPrompt } : prompt));
+      });
+    });
+  }
+  
+
   const copyToClipboard = (text, key) => {
     navigator.clipboard.writeText(text)
       .then(() => {
@@ -60,38 +81,45 @@ function App() {
     <div className="App">
       <Box p={2}>
         <Typography variant="h6" component="div">My Prompts</Typography>
+        <IconButton
+          edge="end"
+          aria-label="delete"
+          onClick={(event) => {}}
+        >
+          <DeleteIcon />
+        </IconButton>
         <List>
           {prompts.map(({ text, key, copied, editing }) => (
             <ListItem key={key} disableGutters>
               <Box
                 className="prompt-container"
-                onClick={() => copyToClipboard(text, key)}
+                // onClick={() => copyToClipboard(text, key)}
               >
                 {copied && (
                   <Box className="copied-notification">
                     Copied!
                   </Box>
                 )}
-                <ListItemText primary={text} />
-                <Box className="delete-button-container">
-                  <IconButton
-                    edge="end"
-                    aria-label="delete"
-                    sx={{ color: 'red' }}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      deletePrompt(key);
-                    }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
+                {editing ? (
+                  <input 
+                    value={text} 
+                    onChange={(event) => handlePromptChange(key, event.target.value)} 
+                    onBlur={() => toggleEdit(key)}
+                    className="edit-prompt"
+                  />
+                ) : (
+                  <ListItemText
+                    primary={text}
+                    onClick={() => copyToClipboard(text, key)}
+                  />
+                )}
                 <IconButton
+                  edge="end"
                   aria-label="edit"
-                  sx={{ color: 'blue' }}
+                  className="edit-button"
                   onClick={(event) => {
                     event.stopPropagation();
-                    // Here you can add the functionality for editing the prompt
+                    toggleEdit(key);
                   }}
                 >
                   <EditIcon />
