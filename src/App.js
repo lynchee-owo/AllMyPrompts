@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 
 function App() {
@@ -25,9 +26,17 @@ function App() {
         chrome.storage.sync.get(key, function(result) {
           let newPrompt = result[key];
           newPrompt.count++;
+          newPrompt.copied = true; // Set copied to true
           chrome.storage.sync.set({ [key]: newPrompt }, function() {
             // Update the local state
             setPrompts(prevPrompts => prevPrompts.map(prompt => prompt.key === key ? { key, ...newPrompt } : prompt));
+            // Set copied back to false after 1 second
+            setTimeout(() => {
+              newPrompt.copied = false;
+              chrome.storage.sync.set({ [key]: newPrompt }, function() {
+                setPrompts(prevPrompts => prevPrompts.map(prompt => prompt.key === key ? { key, ...newPrompt } : prompt));
+              });
+            }, 500);
           });
         });
       })
@@ -52,22 +61,40 @@ function App() {
       <Box p={2}>
         <Typography variant="h6" component="div">My Prompts</Typography>
         <List>
-          {prompts.map(({ text, key }) => (
+          {prompts.map(({ text, key, copied, editing }) => (
             <ListItem key={key} disableGutters>
               <Box
-                className="prompt" 
+                className="prompt-container"
                 onClick={() => copyToClipboard(text, key)}
               >
+                {copied && (
+                  <Box className="copied-notification">
+                    Copied!
+                  </Box>
+                )}
                 <ListItemText primary={text} />
+                <Box className="delete-button-container">
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    sx={{ color: 'red' }}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      deletePrompt(key);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
                 <IconButton
-                  edge="end"
-                  aria-label="delete"
+                  aria-label="edit"
+                  sx={{ color: 'blue' }}
                   onClick={(event) => {
                     event.stopPropagation();
-                    deletePrompt(key);
+                    // Here you can add the functionality for editing the prompt
                   }}
                 >
-                  <DeleteIcon />
+                  <EditIcon />
                 </IconButton>
               </Box>
             </ListItem>
