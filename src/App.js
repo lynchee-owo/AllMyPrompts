@@ -41,7 +41,7 @@ function App() {
   }
 
   // Sort the prompts by usage count
-  // prompts.sort((a, b) => b.count - a.count);
+  prompts.sort((a, b) => b.count - a.count);
 
   return (
     <div className="App">
