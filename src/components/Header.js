@@ -10,6 +10,7 @@ const Header = ({ setDeleteMode }) => {
         edge="end"
         className="delete-button"
         aria-label="delete"
+        color="inherit" 
         onClick={() => setDeleteMode(prev => !prev)}
       >
         <DeleteIcon />
