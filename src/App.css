@@ -46,10 +46,11 @@ body {
   align-items: center;
   position: relative;
   border-radius: 5px;
-  background-color: #c9d3ff;
+  /* background-color: #c9d3ff; */
   padding: 10px 15px;
   width: 100%;
   cursor: pointer;
+  border: 1.5px solid #c9d3ff;
 }
 
 .prompt-container:hover {

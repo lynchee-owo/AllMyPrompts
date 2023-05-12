@@ -1,16 +1,22 @@
 /* global chrome */
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import Header from './components/Header';
 import Clear from '@mui/icons-material/Clear';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Tab, Tabs } from '@mui/material';
+import samplePrompts from './components/samplePrompts';
+
 
 function App() {
   const [prompts, setPrompts] = useState([]);
   const [deleteMode, setDeleteMode] = useState(false);
   const [currentPrompt, setCurrentPrompt] = useState('');
+  const [currentTab, setCurrentTab] = useState(0);
+  const [lastCopiedSamplePrompt, setLastCopiedSamplePrompt] = useState(null);
+
 
   useEffect(() => {
     chrome.storage.sync.get(null, function(items) {
@@ -42,34 +48,48 @@ function App() {
   
 
   const copyToClipboard = (text, key) => {
-    if (deleteMode) {
-      deletePrompt(key);
-    } else {
-      navigator.clipboard.writeText(text)
-        .then(() => {
-          console.log(`Copied: ${text}`);
-          // Increase the count and update the storage
-          chrome.storage.sync.get(key, function(result) {
-            let newPrompt = result[key];
-            newPrompt.count++;
-            newPrompt.copied = true; // Set copied to true
+   navigator.clipboard.writeText(text)
+    .then(() => {
+      console.log(`Copied: ${text}`);
+      setLastCopiedSamplePrompt(text);
+      setTimeout(() => {
+        setLastCopiedSamplePrompt(null);
+      }, 1000);
+      // Increase the count and update the storage
+      chrome.storage.sync.get(key, function(result) {
+        let newPrompt = result[key];
+        newPrompt.count++;
+        newPrompt.copied = true; // Set copied to true
+        chrome.storage.sync.set({ [key]: newPrompt }, function() {
+          // Update the local state
+          setPrompts(prevPrompts => prevPrompts.map(prompt => prompt.key === key ? { key, ...newPrompt } : prompt));
+          // Set copied back to false after 0.5 second
+          setTimeout(() => {
+            newPrompt.copied = false;
             chrome.storage.sync.set({ [key]: newPrompt }, function() {
-              // Update the local state
               setPrompts(prevPrompts => prevPrompts.map(prompt => prompt.key === key ? { key, ...newPrompt } : prompt));
-              // Set copied back to false after 1 second
-              setTimeout(() => {
-                newPrompt.copied = false;
-                chrome.storage.sync.set({ [key]: newPrompt }, function() {
-                  setPrompts(prevPrompts => prevPrompts.map(prompt => prompt.key === key ? { key, ...newPrompt } : prompt));
-                });
-              }, 500);
             });
-          });
-        })
-        .catch(err => {
-          console.error('Could not copy text: ', err);
+          }, 500);
         });
-    }
+      });
+    })
+    .catch(err => {
+      console.error('Could not copy text: ', err);
+    });
+  }
+
+  const copyToClipboardSample = (text) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        console.log(`Copied sample: ${text}`);
+        setLastCopiedSamplePrompt(text);
+        setTimeout(() => {
+          setLastCopiedSamplePrompt(null);
+        }, 500);
+      })
+      .catch(err => {
+        console.error('Could not copy text: ', err);
+      });
   }
 
   const deletePrompt = (key) => {
@@ -86,9 +106,21 @@ function App() {
   return (
     <div className="App">
       <Header setDeleteMode={setDeleteMode} /> 
+      <Box sx={{ flexGrow: 1 }}>
+        <Tabs
+          value={currentTab}
+          onChange={(event, newValue) => {
+            setCurrentTab(newValue);
+          }}
+          centered
+        >
+          <Tab label="My Prompts" />
+          <Tab label="Sample Prompts" />
+        </Tabs>
+      </Box>
       <Box p={2}>
         <List>
-          {prompts.map(({ text, key, copied, editing }) => (
+        {currentTab === 0 ? prompts.map(({ text, key, copied, editing }) => (
             <ListItem key={key} disableGutters>
               <Box className="prompt-container">
                 {copied && (<Box className="copied-notification">Copied!</Box>)}
@@ -124,7 +156,28 @@ function App() {
                 </IconButton>
               </Box>
             </ListItem>
-          ))}
+        )) : (
+          samplePrompts.map((text, index) => {
+            console.log("text:", text);
+            console.log("lastCopiedSamplePrompt:", lastCopiedSamplePrompt);
+            return (
+            <ListItem key={index} disableGutters>
+              <Box
+                className="prompt-container"
+              >
+                {text === lastCopiedSamplePrompt && (
+                    <Box className="copied-notification">
+                      Copied!
+                    </Box>
+                )}
+                <ListItemText
+                  primary={text}
+                  onClick={() => copyToClipboardSample(text)}
+                />
+              </Box>
+            </ListItem>
+          )})
+        )}
         </List>
       </Box>
     </div>
