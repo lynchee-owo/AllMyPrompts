@@ -77,3 +77,15 @@ body {
   border: none;
   outline: none;
 }
+
+.header {
+  background-color: #216bff;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.delete-button {
+  color: white;
+}
