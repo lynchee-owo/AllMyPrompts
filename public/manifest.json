@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "AllMyPrompts",
+  "description": "Easily save and store all prompts used or want to use",
+  "version": "1.0",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": ["storage", "contextMenus"],
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_title": "AllMyPrompts"
+  }
+}
