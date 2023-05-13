@@ -50,11 +50,11 @@ body {
   padding: 10px 15px;
   width: 100%;
   cursor: pointer;
-  border: 1.5px solid #c9d3ff;
+  border: 1.5px solid #b0caff;
 }
 
 .prompt-container:hover {
-  background-color: #8096fa;
+  background-color: #7aa6fe;
 }
 
 .copied-notification {

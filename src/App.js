@@ -108,12 +108,18 @@ function App() {
 
     return [visibleText, hiddenText];
   };
+
+  const exitDeleteMode = () => {
+    if (deleteMode) {
+      setDeleteMode(false);
+    }
+  };
   
   // Sort the prompts by usage count
-  prompts.sort((a, b) => b.count - a.count);
+  // prompts.sort((a, b) => b.count - a.count);
 
   return (
-    <div className="App">
+    <div className="App" onClick={exitDeleteMode}>
       <Header setDeleteMode={setDeleteMode} /> 
       <Box sx={{ flexGrow: 1 }}>
         <Tabs
