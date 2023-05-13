@@ -8,7 +8,7 @@ import Clear from '@mui/icons-material/Clear';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Tab, Tabs } from '@mui/material';
 import samplePrompts from './components/samplePrompts';
-
+import Button from '@mui/material/Button';
 
 function App() {
   const [prompts, setPrompts] = useState([]);
@@ -16,6 +16,7 @@ function App() {
   const [currentPrompt, setCurrentPrompt] = useState('');
   const [currentTab, setCurrentTab] = useState(0);
   const [lastCopiedSamplePrompt, setLastCopiedSamplePrompt] = useState(null);
+  const [expandedPromptKey, setExpandedPromptKey] = useState(null);
 
 
   useEffect(() => {
@@ -100,6 +101,14 @@ function App() {
     });
   }
 
+  const splitPromptText = (text) => {
+    const words = text.split(" ");
+    const visibleText = words.slice(0, 20).join(" ");
+    const hiddenText = words.slice(20).join(" ");
+
+    return [visibleText, hiddenText];
+  };
+  
   // Sort the prompts by usage count
   prompts.sort((a, b) => b.count - a.count);
 
@@ -120,7 +129,11 @@ function App() {
       </Box>
       <Box p={2}>
         <List>
-        {currentTab === 0 ? prompts.map(({ text, key, copied, editing }) => (
+        {currentTab === 0 ? prompts.map(({ text, key, copied, editing }) => {
+          const [visibleText, hiddenText] = splitPromptText(text);
+          const isExpanded = key === expandedPromptKey;
+
+          return (
             <ListItem key={key} disableGutters>
               <Box className="prompt-container">
                 {copied && (<Box className="copied-notification">Copied!</Box>)}
@@ -132,14 +145,25 @@ function App() {
                     onBlur={() => handleClickFinish(key, currentPrompt)}
                   />
                 ) : (
-                  <ListItemText
-                    primary={text}
-                    onClick={() => copyToClipboard(text, key)}
-                  />
+                  <ListItemText>
+                    <span onClick={() => copyToClipboard(text, key)}>
+                      {isExpanded ? text : `${visibleText}...`}
+                    </span>
+                    {hiddenText && (
+                      <span
+                        onClick={() => setExpandedPromptKey(isExpanded ? null : key)}
+                        style={{ color: '#216bff', cursor: 'pointer' }}
+                      >
+                        {isExpanded ? " Collapse" : " Expand"}
+                      </span>
+                    )}
+                  </ListItemText>
                 )}
                 <IconButton
                   edge="end"
+                  className="prompt-button"
                   aria-label={deleteMode ? "delete" : (editing ? "finish" : "edit")}
+                  sx={{ color: '#216bff' }}
                   onClick={(event) => {
                     event.stopPropagation();
                     if (deleteMode) {
@@ -156,8 +180,8 @@ function App() {
                 </IconButton>
               </Box>
             </ListItem>
-        )) : (
-          samplePrompts.map((text, index) => {
+        )}) : (
+          samplePrompts.map(({ text, type }, index) => {
             console.log("text:", text);
             console.log("lastCopiedSamplePrompt:", lastCopiedSamplePrompt);
             return (
@@ -172,6 +196,7 @@ function App() {
                 )}
                 <ListItemText
                   primary={text}
+                  secondary={type}
                   onClick={() => copyToClipboardSample(text)}
                 />
               </Box>
