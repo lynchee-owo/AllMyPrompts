@@ -210,6 +210,11 @@ function App() {
           )})
         )}
         </List>
+        {currentTab === 1 && ( 
+        <Typography variant="body1" color="primary" component="a" href="https://prompts.chat/" target="_blank" rel="noreferrer">
+            More prompts at <span style={{ textDecoration: 'underline' }}>awesome_chatgpt_prompts</span>
+        </Typography>
+        )}
       </Box>
     </div>
   );  
