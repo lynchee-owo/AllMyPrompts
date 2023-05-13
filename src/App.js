@@ -8,7 +8,6 @@ import Clear from '@mui/icons-material/Clear';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Tab, Tabs } from '@mui/material';
 import samplePrompts from './components/samplePrompts';
-import Button from '@mui/material/Button';
 
 function App() {
   const [prompts, setPrompts] = useState([]);
