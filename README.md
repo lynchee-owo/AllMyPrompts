@@ -30,3 +30,5 @@ We welcome contributions from the community. To contribute:
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
+## Credit
+I used some prompts from the awesome_chatgpt_prompts repository as sample prompts.
