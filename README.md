@@ -4,6 +4,12 @@
 
 AllMyPrompts is a Chrome extension that allows users to easily save and retrieve prompts for their needs.
 
+
+## How to use:
+1. highlight any text and right click to "save prompts"
+2. copy your prompt from the extension popup window
+
+
 ## Links
 chrome web store: https://chrome.google.com/webstore/detail/allmyprompts/gcaakajkidheihdokamkfoebedocbdam/related
 
